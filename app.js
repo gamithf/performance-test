@@ -1,4 +1,6 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
+
 const app = express();
 const port = 3000;
 
@@ -12,7 +14,6 @@ app.get('/', (req, res) => {
   res.send('<h1>Performance Testing Page</h1><p>This is a simple page to test performance.</p>');
 });
 
-// GET (API endpoint to fetch data)
 app.get('/api/data', (req, res) => {
   res.status(200).json({ 
     status: 'success', 
@@ -21,7 +22,6 @@ app.get('/api/data', (req, res) => {
   });
 });
 
-// POST (API endpoint to store data)
 app.post('/api/data', (req, res) => {
   const { name, age } = req.body;
   
@@ -38,7 +38,16 @@ app.post('/api/data', (req, res) => {
   });
 });
 
-// Start server
+app.delete('/api/data', (req, res) => {
+  mockDatabase = []; // Clear test data
+  res.sendStatus(204);
+});
+
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000 // limit each IP to 1000 requests per windowMs
+}));
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
